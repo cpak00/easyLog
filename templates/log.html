@@ -13,7 +13,6 @@
     </head>
     <body>
         <a href='/' class='btn'>返回首页</a>
-        <a id='look_all_button' class='btn'>查看全部</a>
         <div class='ui-state-highlight'>
         <h3>{{logname}}</h3>
         <div class='content'>{{content}}</div>
@@ -22,9 +21,6 @@
     <script>
         $(function(){
             $('.btn').button();
-            $('#look_all_button').click(function(){
-                window.location.href = window.location.pathname+'?lines=0';
-            })
         })
     </script>
 </html>
