@@ -25,21 +25,19 @@ def log_get(path):
         content = logparser.look_tail('../' + path, lines)
 
     return content
-    '''
+'''
     return F.render_template(
         'log.html',
         logname=path,
         content=content)
-    '''
+'''
+
 
 @app.route('/look/log/<path>', methods=['GET'])
 def logall_get(path):
     content = logparser.look_all('../' + path)
 
-    return F.render_template(
-        'log.html',
-        logname=path,
-        content=content)
+    return F.render_template('log.html', logname=path, content=content)
 
 
 if __name__ == '__main__':

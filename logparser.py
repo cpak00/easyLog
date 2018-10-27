@@ -6,6 +6,7 @@ from os import path
 def get_log_list(ext='.log'):
     result = []
     for root, dirs, files in os.walk('../'):
+        dirs
         for file in files:
             if os.path.splitext(file)[1] == ext:
                 result.append(os.path.join(root, file))
