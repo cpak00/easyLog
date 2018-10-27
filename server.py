@@ -1,10 +1,23 @@
 import flask as F
+from flask_httpauth import HTTPBasicAuth
 import logparser
+import config
 
 app = F.Flask(__name__)
+auth = HTTPBasicAuth()
+
+
+# 认证
+@auth.get_password
+def get_password(username):
+    for user in config.users:
+        if user['username'] == username:
+            return user['userpass']
+    return None
 
 
 @app.route('/', methods=['GET'])
+@auth.login_required
 def index_get():
     # 后缀名为log
     ext = '.log'
@@ -16,6 +29,7 @@ def index_get():
 
 
 @app.route('/log/<path>', methods=['GET'])
+@auth.login_required
 def log_get(path):
     lines = int(F.request.args.get('lines', '20'))
 
@@ -25,15 +39,10 @@ def log_get(path):
         content = logparser.look_tail('../' + path, lines)
 
     return content
-'''
-    return F.render_template(
-        'log.html',
-        logname=path,
-        content=content)
-'''
 
 
 @app.route('/look/log/<path>', methods=['GET'])
+@auth.login_required
 def logall_get(path):
     content = logparser.look_all('../' + path)
 
