@@ -21,6 +21,9 @@ git clone https://github.com/cpak00/easyLog.git & cd easyLog & bash run.sh
 
 ```
 
+用户名密码配置在config.py下
+以列表形式存在, 可以配置多个用户名密码对
+
 浏览器访问
 ```
 http://ip:5000/
