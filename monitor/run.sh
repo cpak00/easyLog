@@ -1,0 +1,1 @@
+nohup python3 server.py & echo $! $$ > pid.txt

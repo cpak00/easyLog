@@ -1,0 +1,147 @@
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>在线日志</title>
+        <link rel="stylesheet" href="//apps.bdimg.com/libs/jqueryui/1.10.4/css/jquery-ui.min.css">
+        <script src="//apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+        <style>
+            a {
+                text-decoration: none;
+            }
+            .monitor-window {
+                width: 400px;
+                height: 0px;
+            }
+            .text {
+                white-space: pre-wrap;
+            }
+            .content-text {
+                height: 80%;
+                width: 100%;
+                white-space: pre-wrap;
+                overflow-x: hidden;
+                overflow-y: scroll;
+            }
+            .btn {
+                height: 20px;
+                font-size: 0.5em;
+            }
+            .auto-second {
+                width: 40px;
+            }
+            * {
+                padding: 0;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+        <ul class="accordion">
+            {% for logday in day_list %}
+            <div class="ui-content">
+                <h3>{{logday}}</h3>
+                <div class="log-content">
+                {% for logpath in log_list[logday] %}
+                    <li><a href='#' id='/log//{{logpath}}' class="monitor">{{logpath}}</a></li>
+                {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </ul>
+        </div>
+    </body>
+    <script>
+        $(function(){
+            $('.accordion').accordion({
+                collapsible: true,
+                header: "h3"
+            });
+            $('.monitor').click(function() {
+                var monitorWindow = $('\
+                <div class="monitor-window">\
+                    <div class="ui-state-highlight">\
+                    <h3 class="title-text text"></h3>\
+                    <a class="fresh-button btn">刷新窗口</a>\
+                    <a class="look-all btn">查看全部</a>\
+                    <input type="checkbox" class="auto-fresh btn">\
+                    <label class="auto-label btn">auto</label>\
+                    <input type="number" class="auto-second" value="10">s\
+                    <a class="close-button btn">关闭窗口</a>\
+                    </div>\
+                    <div>\
+                        <div class="content-text ui-widget-content">\
+                        </div>\
+                    </div>\
+                </div>\
+                ');
+
+                var id = 'auto-fresh-'+$('.monitor-window').length;
+                monitorWindow.find('.auto-fresh').attr('id', id);
+                monitorWindow.find('.auto-label').attr('for', id);
+                $('body').append(monitorWindow);
+
+                var path = $(this).attr('id');
+                monitorWindow.find('.title-text').text(path);
+                monitorWindow.find('.fresh-button').button({
+                    icons: {
+                        primary: 'ui-icon-arrowrefresh-1-s'
+                    },
+                    text: false
+                }).click(function() {
+                    $.get(path, function(data) {
+                        monitorWindow.find('.content-text').text(data)
+                    });
+                });
+                monitorWindow.find('.close-button').button({
+                    icons: {
+                        primary: 'ui-icon-close'
+                    },
+                    text: false
+                }).click(function() {
+                    if (monitorWindow.handle)
+                        clearInterval(monitorWindow.handle);
+                    monitorWindow.remove();
+                });
+                monitorWindow.find('.look-all').button({
+                    icons: {
+                        primary: 'ui-icon-circlesmall-plus'
+                    },
+                    text: false
+                }).click(function() {
+                    window.open('/look'+path);
+                });
+                
+                monitorWindow.handle = undefined;
+                monitorWindow.find('.auto-fresh').button().click(function() {
+                    var second = monitorWindow.find('.auto-second');
+                    console.log(second);
+                    if (!monitorWindow.handle) {
+                        second.prop('disabled', true);
+                        monitorWindow.handle = setInterval(function() {
+                            $.get(path, function(data) {
+                                monitorWindow.find('.content-text').text(data);
+                            });
+                        }, second.val() * 1000);
+                    } else {
+                        second.prop('disabled', false);
+                        clearInterval(monitorWindow.handle)
+                        monitorWindow.handle = undefined;
+                    }
+                })
+                monitorWindow.draggable().resizable({
+                    minWidth: 200,
+                    maxWidth: 800,
+                    minHeight: 400,
+                    maxHeight: 600,
+                });
+
+                $.get(path, function(data) {
+                    monitorWindow.find('.content-text').text(data)
+                });
+            });
+        })
+    </script>
+</html>
